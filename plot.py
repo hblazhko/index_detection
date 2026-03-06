@@ -1,18 +1,17 @@
-import sys
+# python
+import argparse
+import os
+import logging
+from typing import Optional
+
 import numpy as np
 import matplotlib.pyplot as plt
-import importlib.util
-from pathlib import Path
 
-from src.method1 import (
-    method_1,
-    method_1_bounds_cor_2_2,
-    method_1_bounds_cor_2_3,
-    method_1_bounds_th_1_1,
-    compute_tau0
-)
+from src.utils import load_config, load_matrices, call_function, compute_bounds
+from src.method1 import compute_tau0
 from src.method2 import method_2, method_2_error
-
+from src.method1 import method_1, method_1_bounds_cor_2_2, method_1_bounds_cor_2_3, method_1_bounds_th_1_1
+from src.utils import plot_method1, plot_method2
 
 METHODS = {
     "method_1": method_1,
@@ -26,165 +25,81 @@ BOUNDS = {
     "method_2_error": method_2_error,
 }
 
-METHOD_ARGS = {
-    "method_1": ["A", "E"],
-    "method_2": ["A", "E"],
-}
 
-BOUNDS_ARGS = {
-    "method_1_bounds_th_1_1": ["A", "E", "A12", "A21", "E11"],
-    "method_1_bounds_cor_2_2": ["A", "E", "A12", "A21", "E11"],
-    "method_1_bounds_cor_2_3": ["A", "E"],
-    "method_2_error": ["A"],
-}
-
-TAU0_ARGS = ["A", "E", "A11", "E11"]
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(description="Plot experiment results for index_detection")
+    p.add_argument("config", help="Path to experiment config (python file or json)")
+    p.add_argument("--save", "-s", metavar="OUT", help="Save plot to path (PNG/PDF). If omitted, show interactively.")
+    p.add_argument("--no-show", action="store_true", help="Do not call plt.show() (useful in CI).")
+    return p
 
 
-def load_config(path):
-
-    spec = importlib.util.spec_from_file_location("config", path)
-    config = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(config)
-
-    return config.EXPERIMENT
-
-
-def load_matrices(folder):
-
-    folder = Path(folder)
-    matrices = {}
-
-    for name in ["A", "E", "Q", "A11", "A12", "A21", "E11"]:
-        file = folder / f"{name}.npy"
-        if file.exists():
-            matrices[name] = np.load(file)
-
-    return matrices
-
-
-def select_args(names, matrices):
-
-    return {k: matrices[k] for k in names if k in matrices}
-
-
-def main():
-
-    if len(sys.argv) < 2:
-        raise ValueError("Usage: python plot.py config/experiment.py")
-
-    config_path = sys.argv[1]
-    save = "--save" in sys.argv
-
+def run_plot(config_path: str, save_path: Optional[str] = None, show: bool = True) -> plt.Figure:
     exp = load_config(config_path)
+    if not isinstance(exp, dict):
+        raise ValueError("Loaded config must be a dict-like object")
 
-    if "seed" in exp:
-        np.random.seed(exp["seed"])
+    seed = exp.get("seed")
+    if seed is not None:
+        np.random.seed(seed)
 
-    matrices = load_matrices(exp["data_folder"])
+    data_folder = exp.get("data_folder")
+    if not data_folder:
+        raise KeyError("config missing required key: data_folder")
+    matrices = load_matrices(data_folder)
 
-    method_fun = METHODS[exp["method"]]
-    bounds_fun = BOUNDS[exp["bounds"]]
+    method_name = exp.get("method")
+    if method_name not in METHODS:
+        raise KeyError(f"Unsupported method: {method_name}")
 
-    method_args = select_args(METHOD_ARGS[exp["method"]], matrices)
+    method_fun = METHODS[method_name]
+    method_params = exp.get("method_params", {})
 
-    calc = method_fun(**method_args, **exp["method_params"])
+    calc = call_function(method_fun, matrices, method_params)
 
-    if exp["bounds"] == "method_2_error":
-
-        n = matrices["A"].shape[0]
-
-        bounds = bounds_fun(
-            n,
-            **exp["bounds_params"]
-        )
-
-    else:
-
-        bounds_args = select_args(BOUNDS_ARGS[exp["bounds"]], matrices)
-
-        bounds = bounds_fun(**bounds_args, **exp["bounds_params"])
-
-    delta = exp["bounds_params"].get("delta", None)
+    bounds = compute_bounds(exp, matrices, calc, BOUNDS)
 
     tau0 = None
-
-    if exp.get("calculate_tau0", False):
-
-        tau0_args = select_args(TAU0_ARGS, matrices)
-
-        tau0 = compute_tau0(
-            **tau0_args,
-            **exp["method_params"]
-        )
+    delta = None
+    if method_name == "method_1":
+        if exp.get("calculate_tau0", False):
+            tau0 = call_function(compute_tau0, matrices, method_params)
+        delta = exp.get("bounds_params", {}).get("delta")
 
     fig, ax = plt.subplots()
-
     ax.set_box_aspect(4 / 7)
 
-    if exp["method"] == "method_1":
-
-        ax.loglog(calc["tau"], 1 / calc["dist"], linewidth=1.9, color="C0")
-
-        ax.loglog(
-            bounds["tau"],
-            1 / bounds["upper_bounds"],
-            linestyle="-.",
-            linewidth=1.9,
-            color="C1",
-        )
-
-        ax.loglog(
-            bounds["tau"],
-            1 / bounds["lower_bounds"],
-            linestyle="-.",
-            linewidth=1.9,
-            color="C1",
-        )
-
+    if method_name == "method_1":
+        plot_method1(ax, calc, bounds, tau0, delta)
     else:
+        plot_method2(ax, calc, bounds)
 
-        ax.loglog(calc["tau"], calc["dist"], linewidth=1.9, color="C0")
-
-        ax.loglog(
-            bounds["tau"],
-            bounds["lower"],
-            linestyle="-.",
-            linewidth=1.9,
-            color="C2",
-        )
-
-        ax.loglog(
-            bounds["tau"],
-            bounds["upper"],
-            linestyle="-.",
-            linewidth=1.9,
-            color="C2",
-        )
-
-    if tau0 is not None and np.isfinite(tau0):
-        ax.axvline(tau0, linestyle=":", linewidth=1.8, color="C3")
-
-    if delta is not None:
-        ax.axvline(delta, linestyle="--", linewidth=1.8, color="C4")
-
-    plot = exp.get("plot", {})
-
-    if plot.get("grid", False):
+    plot_opts = exp.get("plot", {})
+    if plot_opts.get("grid"):
         ax.grid(True)
-
-    if "ylim" in plot:
-        ax.set_ylim(*plot["ylim"])
-
-    if "xlim" in plot:
-        ax.set_xlim(*plot["xlim"])
+    if "ylim" in plot_opts:
+        ax.set_ylim(*plot_opts["ylim"])
+    if "xlim" in plot_opts:
+        ax.set_xlim(*plot_opts["xlim"])
 
     plt.tight_layout()
 
-    if save:
-        plt.savefig("figure.pdf")
-    else:
+    if save_path:
+        out_dir = os.path.dirname(save_path) or "."
+        os.makedirs(out_dir, exist_ok=True)
+        fig.savefig(save_path)
+        logging.info("Saved figure to %s", save_path)
+
+    if show and not save_path and not plt.isinteractive():
         plt.show()
+
+    return fig
+
+
+def main() -> None:
+    parser = build_parser()
+    args = parser.parse_args()
+    run_plot(args.config, save_path=args.save, show=not args.no_show)
 
 
 if __name__ == "__main__":

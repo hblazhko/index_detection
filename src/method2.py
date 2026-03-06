@@ -32,12 +32,14 @@ def method_2(A, E, samples_number=10, h=np.exp(-3), tau_min=-20, tau_max=2, tau_
     }
 
 
-def method_2_error(n, delta=1e-15, tau_min=-20, tau_max=2, tau_number=300):
+def method_2_error(A, delta=1e-15, tau_min=-20, tau_max=2, tau_number=300):
     """Error estimate from Theorem 1.2"""
+
+    n = A.shape[0]
 
     taus = np.logspace(tau_min, tau_max, tau_number)
 
-    beta = n * np.sqrt(
+    beta = (n**2) * (
         11
         + 4 * np.sqrt(2)
         + np.sqrt(np.pi) / (2 * n**(3/2))
@@ -45,11 +47,11 @@ def method_2_error(n, delta=1e-15, tau_min=-20, tau_max=2, tau_number=300):
         + np.sqrt(np.pi) * (8 * np.sqrt(2) + 12) / np.sqrt(n)
     )
 
-    coef = delta * beta
+    coef = delta * np.sqrt(n * beta)
 
     errors = coef / taus
 
     return {
-        'tau': taus,
-        'errors': errors,
+        "tau": taus,
+        "errors": errors,
     }

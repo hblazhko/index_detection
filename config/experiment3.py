@@ -2,22 +2,23 @@ EXPERIMENT = {
 
     "seed": 1,
 
-    "data_folder": "data/example_5_1",
+    "data_folder": "data/example_5_2",
 
-    "calculate_tau0": True,
+    "calculate_tau0": False,
 
     "method": "method_1",
 
     "method_params": {
+        "delta": 1e-15,
         "tau_min": -20,
         "tau_max": 2,
         "tau_number": 300
     },
 
-    "bounds": "method_1_bounds_th_1_1",
+    "bounds": "method_1_bounds_cor_2_3",
 
     "bounds_params": {
-        "delta": 1e-6,
+        "delta": 1e-15,
         "tau_min": -20,
         "tau_max": 2,
         "tau_number": 300
@@ -25,6 +26,6 @@ EXPERIMENT = {
 
     "plot": {
         "grid": True,
-        "ylim": (1e-10, 1e2)
+        "ylim": (1e-22, 1e1)
     }
 }
