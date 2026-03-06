@@ -1,4 +1,5 @@
-import numpy as np
+# python
+"""Utilities for Method 1 computations used in index_detection."""
 from scipy.linalg import eig
 from numpy.linalg import cond
 from scipy.linalg import svdvals

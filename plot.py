@@ -1,4 +1,10 @@
 # python
+"""Command-line plotting entry point for index_detection experiments.
+
+Loads an experiment config and necessary data, runs the chosen computation
+(`method_1` or `method_2`), optionally computes bounds, and produces or saves
+a log-log plot of the obtained results.
+"""
 import argparse
 import os
 import logging
@@ -35,19 +41,23 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def run_plot(config_path: str, save_path: Optional[str] = None, show: bool = True) -> plt.Figure:
+    # Load experiment config (expects a dict-like EXPERIMENT)
     exp = load_config(config_path)
     if not isinstance(exp, dict):
         raise ValueError("Loaded config must be a dict-like object")
 
+    # Optional reproducibility seed
     seed = exp.get("seed")
     if seed is not None:
         np.random.seed(seed)
 
+    # Load matrices from data folder
     data_folder = exp.get("data_folder")
     if not data_folder:
         raise KeyError("config missing required key: data_folder")
     matrices = load_matrices(data_folder)
 
+    # Select computation method
     method_name = exp.get("method")
     if method_name not in METHODS:
         raise KeyError(f"Unsupported method: {method_name}")
@@ -55,10 +65,13 @@ def run_plot(config_path: str, save_path: Optional[str] = None, show: bool = Tru
     method_fun = METHODS[method_name]
     method_params = exp.get("method_params", {})
 
+    # Compute main results
     calc = call_function(method_fun, matrices, method_params)
 
+    # Compute optional bounds (may return None if config opts out)
     bounds = compute_bounds(exp, matrices, calc, BOUNDS)
 
+    # Optional extra diagnostics for method_1
     tau0 = None
     delta = None
     if method_name == "method_1":
@@ -66,14 +79,17 @@ def run_plot(config_path: str, save_path: Optional[str] = None, show: bool = Tru
             tau0 = call_function(compute_tau0, matrices, method_params)
         delta = exp.get("bounds_params", {}).get("delta")
 
+    # Prepare figure and axis
     fig, ax = plt.subplots()
     ax.set_box_aspect(4 / 7)
 
+    # Plot according to selected method
     if method_name == "method_1":
         plot_method1(ax, calc, bounds, tau0, delta)
     else:
         plot_method2(ax, calc, bounds)
 
+    # Apply optional plot settings from config
     plot_opts = exp.get("plot", {})
     if plot_opts.get("grid"):
         ax.grid(True)
@@ -84,12 +100,14 @@ def run_plot(config_path: str, save_path: Optional[str] = None, show: bool = Tru
 
     plt.tight_layout()
 
+    # Save to file if requested
     if save_path:
         out_dir = os.path.dirname(save_path) or "."
         os.makedirs(out_dir, exist_ok=True)
         fig.savefig(save_path)
         logging.info("Saved figure to %s", save_path)
 
+    # Show interactively only when not saving and allowed
     if show and not save_path and not plt.isinteractive():
         plt.show()
 

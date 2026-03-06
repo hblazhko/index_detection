@@ -1,7 +1,7 @@
+# python
+"""Utilities for Method 2 computations used in index_detection."""
 import numpy as np
 from scipy.linalg import eig
-from numpy.linalg import cond
-from scipy.linalg import svdvals
 
 def method_2(A, E, samples_number=10, h=np.exp(-3), tau_min=-20, tau_max=2, tau_number=300):
     """
