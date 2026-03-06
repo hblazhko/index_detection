@@ -25,6 +25,32 @@ def method_1(A, E, tau_min=-20, tau_max=2, tau_number=300):
     }
 
 
+def compute_tau0(A, E, A11, E11, tau_min=-20, tau_max=2, tau_number=300):
+    """Compute tau0 from Theorem 1.1., equation (1.3). """
+    taus = np.logspace(tau_min, tau_max, tau_number)
+
+    sigma_min_E11 = np.linalg.svd(E11, compute_uv=False)[-1]
+    norm_A11 = np.linalg.norm(A11)
+
+    I = np.eye(E.shape[0])
+
+    tau0 = None
+
+    for tau in taus:
+
+        eigs = eig(A, E + tau * I, left=False, right=False)
+
+        rhs = norm_A11 / (tau + sigma_min_E11)
+
+        if np.abs(eigs).max() > rhs:
+            tau0 = tau
+
+    if tau0 is None:
+        return 0.0
+
+    return tau0
+
+
 def method_1_bounds_th_1_1(A, E, A12, A21, E11, delta=1e-15,
                            tau_min=-20, tau_max=2, tau_number=300):
     """Bounds from Theorem 1.1 (explicit block structure). """
