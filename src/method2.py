@@ -39,7 +39,7 @@ def method_2_error(A, delta=1e-15, tau_min=-20, tau_max=2, tau_number=300):
 
     taus = np.logspace(tau_min, tau_max, tau_number)
 
-    beta = (n**2) * (
+    beta = n * np.sqrt(
         11
         + 4 * np.sqrt(2)
         + np.sqrt(np.pi) / (2 * n**(3/2))
@@ -47,7 +47,7 @@ def method_2_error(A, delta=1e-15, tau_min=-20, tau_max=2, tau_number=300):
         + np.sqrt(np.pi) * (8 * np.sqrt(2) + 12) / np.sqrt(n)
     )
 
-    coef = delta * np.sqrt(n * beta)
+    coef = delta * beta
 
     errors = coef / taus
 
