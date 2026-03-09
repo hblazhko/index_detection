@@ -3,6 +3,7 @@
 from scipy.linalg import eig
 from numpy.linalg import cond
 from scipy.linalg import svdvals
+import numpy as np
 
 def method_1(A, E, tau_min=-20, tau_max=2, tau_number=300):
     """

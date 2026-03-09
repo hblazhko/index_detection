@@ -2,9 +2,7 @@ EXPERIMENT = {
 
     "seed": 1,
 
-    "data_folder": "data/example_5_2",
-
-    "calculate_tau0": False,
+    "data_folder": "data/example2",
 
     "method": "method_1",
 
@@ -23,6 +21,8 @@ EXPERIMENT = {
         "tau_max": 2,
         "tau_number": 300
     },
+
+    "calculate_tau0": False,
 
     "plot": {
         "grid": True,

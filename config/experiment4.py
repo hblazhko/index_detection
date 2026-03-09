@@ -2,7 +2,7 @@ EXPERIMENT = {
 
     "seed": 1,
 
-    "data_folder": "data/example_5_3b",
+    "data_folder": "data/example_3a",
 
     "calculate_tau0": False,
 
