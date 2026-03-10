@@ -191,31 +191,16 @@ Example:
 
 # Minimal Configuration Example
 
-Example file: `config/my_experiment.py`
-
+Save the following as `config/my_experiment.py`:
 ```python
 EXPERIMENT = {
-    "data_folder": "data/example1",
+    "data_folder": "data/example",      # your example
 
-    "method": "method_1",
+    "method": "method_1",               # method to calculate
 
-    "method_params": {},
+    "bounds": "method_1_bounds_th_1_1", # theoretical bounds to plot
 
-    "seed": 42,
-
-    "bounds": "method_1_bounds_th_1_1",
-
-    "bounds_params": {
-        "delta": 1e-15
-    },
-
-    "calculate_tau0": True,
-
-    "plot": {
-        "grid": True,
-        "xlim": [1e-4, 1e2],
-        "ylim": [1e-8, 1e2]
-    }
+    "calculate_tau0": True              # whether to compute τ₀ for method_1
 }
 ```
 
@@ -225,4 +210,4 @@ Run it using:
 python plot.py config/my_experiment.py
 ```
 
-Other example configurations are available in the `config/` directory.
+Other example configurations used in our simulations are available in the `config/` directory.
