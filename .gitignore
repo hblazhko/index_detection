@@ -1,0 +1,15 @@
+# Minimal .gitignore
+
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+env/
+.env
+
+# macOS
+.DS_Store
+
+# IDE (PyCharm)
+../.idea/
