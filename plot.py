@@ -16,7 +16,8 @@ import matplotlib.pyplot as plt
 from src.utils import load_config, load_matrices, call_function, compute_bounds
 from src.method1 import compute_tau0
 from src.method2 import method_2, method_2_error
-from src.method1 import method_1, method_1_bounds_cor_2_2, method_1_bounds_cor_2_3, method_1_bounds_th_1_1
+from src.method1 import (method_1, method_1_bounds_th_1_1, method_1_bounds_cor_2_2,
+                         method_1_bounds_cor_2_3, method_1_bounds_cor_3_3)
 from src.utils import plot_method1, plot_method2
 
 METHODS = {
@@ -28,6 +29,7 @@ BOUNDS = {
     "method_1_bounds_th_1_1": method_1_bounds_th_1_1,
     "method_1_bounds_cor_2_2": method_1_bounds_cor_2_2,
     "method_1_bounds_cor_2_3": method_1_bounds_cor_2_3,
+    "method_1_bounds_cor_3_3": method_1_bounds_cor_3_3,
     "method_2_error": method_2_error,
 }
 

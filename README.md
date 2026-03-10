@@ -39,13 +39,13 @@ Run the plotting script with a configuration file defining an `EXPERIMENT` dicti
 ### Interactive plot
 
 ```bash
-python plot.py config/experiment1.py
+python plot.py config/experiment1_1.py
 ```
 
 ### Save plot to file
 
 ```bash
-python plot.py config/experiment1.py --save results/plot.png
+python plot.py config/experiment1_1.py --save results/plot.png
 
 ```
 
@@ -59,12 +59,11 @@ python plot.py config/experiment1.py --save results/plot.png
 |--------|-------------|
 | `config` | Path to the experiment configuration file |
 | `--save`, `-s OUT` | Save the produced figure to `OUT` (PNG or PDF) |
-| `--no-show` | Do not display the plot interactively |
 
 Example:
 
 ```bash
-python plot.py config/experiments.py --save figures/run1.pdf --no-show
+python plot.py config/experiment.py --save results/plot.pdf
 ```
 
 ---
@@ -83,10 +82,13 @@ index_detection/
 │   └── utils.py           # Helper utilities (loading data, plotting, etc.)
 │
 ├── config/
-│   └── experiment1.py     # Example experiment configuration
+│   └── experiment1_1.py     # Example experiment configuration
 │
-└──data/
-    └── example1           # Matrix datasets (.npy files)
+├──data/
+│    └── example1          # Matrix datasets (.npy files)
+│
+└──results/
+    └── plot.png            # Example output plot
 ```
 
 ---
@@ -109,7 +111,7 @@ data/run1/
     Q.npy
 ```
 
-Possible files include `A.npy`, `E.npy`, `Q.npy`, `A11.npy`, `A12.npy`, `A21.npy`, `E11.npy` (depending on the experiment).
+Possible files include `A.npy`, `E.npy`, `Q.npy`, `R.npy`, `J.npy`, `A11.npy`, `A12.npy`, `A21.npy`, `E11.npy` (depending on the experiment).
 
 #### `method`
 
@@ -166,6 +168,7 @@ Optional theoretical bounds to plot:
 method_1_bounds_th_1_1
 method_1_bounds_cor_2_2
 method_1_bounds_cor_2_3
+method_1_bounds_cor_3_3
 method_2_error
 None
 ```

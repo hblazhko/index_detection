@@ -2,9 +2,7 @@ EXPERIMENT = {
 
     "seed": 1,
 
-    "data_folder": "data/example_3a",
-
-    "calculate_tau0": False,
+    "data_folder": "data/example4",
 
     "method": "method_1",
 
@@ -14,10 +12,19 @@ EXPERIMENT = {
         "tau_number": 300
     },
 
-    "bounds": None,
+    "bounds": "method_1_bounds_th_1_1",
+
+    "bounds_params": {
+        "delta": 1e-15,
+        "tau_min": -20,
+        "tau_max": 2,
+        "tau_number": 300
+    },
+
+    "calculate_tau0": True,
 
     "plot": {
         "grid": True,
-        "ylim": (1e-18, 1e4)
+        "ylim": (1e-25, 1e-3)
     }
 }

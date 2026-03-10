@@ -21,7 +21,7 @@ def load_matrices(folder):
 
     matrices = {}
     # Load only the files the rest of the code expects.
-    for name in ["A", "E", "Q", "A11", "A12", "A21", "E11"]:
+    for name in ["A", "E", "Q", "J", "R", "A11", "A12", "A21", "E11"]:
         file = folder / f"{name}.npy"
         if file.exists():
             matrices[name] = np.load(file)
