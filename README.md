@@ -19,7 +19,7 @@ The main entry point is **`plot.py`**, which:
 Clone the repository:
 
 ```bash
-git clone https://github.com/<username>/index_detection.git
+git clone https://github.com/hblazhko/index_detection.git
 cd index_detection
 ```
 
@@ -42,28 +42,11 @@ Run the plotting script with a configuration file defining an `EXPERIMENT` dicti
 python plot.py config/experiment1_1.py
 ```
 
-### Save plot to file
+### Save plot to file (png or pdf)
 
 ```bash
-python plot.py config/experiment1_1.py --save results/plot.png
+python plot.py config/experiment1_1.py --save results/experiment1_1.png
 
-```
-
----
-
-# Command-Line Arguments
-
-`plot.py` accepts the following arguments:
-
-| Argument | Description |
-|--------|-------------|
-| `config` | Path to the experiment configuration file |
-| `--save`, `-s OUT` | Save the produced figure to `OUT` (PNG or PDF) |
-
-Example:
-
-```bash
-python plot.py config/experiment.py --save results/plot.pdf
 ```
 
 ---
